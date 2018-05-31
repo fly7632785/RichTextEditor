@@ -29,13 +29,13 @@ public class MainActivity extends AppCompatActivity {
         richEditText = (RichEditText) findViewById(R.id.rich_text);
         richEditText.fromHtml(
                 "<blockquote>Android 端的富文本编辑器</blockquote>" +
-                "<ul>" +
+                        "<ul>" +
                         "<li>支持实时编辑</li>" +
                         "<li>支持图片插入,加粗,斜体,下划线,删除线,列表,引用块,超链接,撤销与恢复等</li>" +
                         "<li>使用<u>Glide 4</u>加载图片</li>" +
-                "</ul>" +
-                "<img src=\"http://biuugames.huya.com/221d89ac671feac1.gif\"><br><br>" +
-                "<img src=\"http://biuugames.huya.com/5-160222145918.jpg\"><br><br>"
+                        "</ul>" +
+                        "<img src=\"http://biuugames.huya.com/221d89ac671feac1.gif\"><br><br>" +
+                        "<img src=\"http://biuugames.huya.com/5-160222145918.jpg\"><br><br>"
         );
     }
 
@@ -77,6 +77,48 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 加粗
      */
+    public void insertBold(View v) {
+        v.setSelected(!v.isSelected());
+        //设置仅仅使用selected来表示是否选中，建议src drawable改为两种选中和未选中状态图片
+        richEditText.setBold(v.isSelected());
+    }
+
+    /**
+     * 斜体
+     */
+    public void insertItalic(View v) {
+        v.setSelected(!v.isSelected());
+        richEditText.setItalicSpan(v.isSelected());
+    }
+
+    /**
+     * 下划线
+     */
+    public void insertUnderline(View v) {
+        v.setSelected(!v.isSelected());
+        richEditText.setUnderline(v.isSelected());
+    }
+
+    /**
+     * 删除线
+     */
+    public void insertStrikethrough(View v) {
+        v.setSelected(!v.isSelected());
+        richEditText.setStrikeThrough(v.isSelected());
+    }
+
+    /**
+     * link
+     */
+    public void insertLink(View v) {
+        v.setSelected(!v.isSelected());
+        richEditText.setLink(v.isSelected());
+    }
+
+
+    /**
+     * 加粗
+     */
     public void setBold(View v) {
         richEditText.bold(!richEditText.contains(RichEditText.FORMAT_BOLD));
     }
@@ -100,6 +142,19 @@ public class MainActivity extends AppCompatActivity {
      */
     public void setStrikethrough(View v) {
         richEditText.strikethrough(!richEditText.contains(RichEditText.FORMAT_STRIKETHROUGH));
+    }
+
+    /**
+     * link
+     */
+    public void setLink(View v) {
+        v.setSelected(!v.isSelected());
+        //通过str是否为空来表示 是把选中的文字变为link或者非link
+        if (v.isSelected()) {
+            richEditText.link("1");
+        } else {
+            richEditText.link("");
+        }
     }
 
     /**

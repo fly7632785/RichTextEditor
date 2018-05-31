@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
+import android.text.ParcelableSpan;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -67,6 +68,10 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
     private GlideRequests glideRequests;
     private Editable inputLast;
 
+    private List<ParcelableSpan> styleSpans = new ArrayList<>();
+    private int textStart;
+    private int textEnd;
+
     public RichEditText(Context context) {
         super(context);
         init(context, null);
@@ -115,8 +120,106 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
         removeTextChangedListener(this);
     }
 
-    // StyleSpan ===================================================================================
 
+    /**
+     * * * * * * *  增加选中样式操作 start* * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *
+     * 选择了样式之后，打字则为该样式，可叠加
+     * 目前包含 加粗、斜体、下划线、删除线、link种类（link可能会覆盖下划线）
+     */
+    private StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
+
+    private StyleSpan italicSpan = new StyleSpan(Typeface.ITALIC);
+
+    private UnderlineSpan underlineSpan = new UnderlineSpan();
+
+    private StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
+
+    private URLSpan linkSpan = new URLSpan("");
+
+    // set StyleSpan ===================================================================================
+
+    /**
+     * 设置粗体样式
+     *
+     * @param valid 是否为粗体
+     */
+    public void setBold(boolean valid) {
+        if (valid) {
+            styleSpans.add(boldSpan);
+        } else {
+            styleSpans.remove(boldSpan);
+        }
+    }
+
+    // set setItalicSpan ===================================================================================
+
+    /**
+     * 设置斜体样式
+     *
+     * @param valid 是否为斜体
+     */
+    public void setItalicSpan(boolean valid) {
+        if (valid) {
+            styleSpans.add(italicSpan);
+        } else {
+            styleSpans.remove(italicSpan);
+        }
+    }
+
+    // set UnderlineSpan ===================================================================================
+
+    /**
+     * 设置下划线样式
+     *
+     * @param valid 是否为下划线
+     */
+    public void setUnderline(boolean valid) {
+        if (valid) {
+            styleSpans.add(underlineSpan);
+        } else {
+            styleSpans.remove(underlineSpan);
+        }
+    }
+
+    // set strikethroughSpan ===================================================================================
+
+    /**
+     * 设置删除线样式
+     *
+     * @param valid 是否为删除线
+     */
+    public void setStrikeThrough(boolean valid) {
+        if (valid) {
+            styleSpans.add(strikethroughSpan);
+        } else {
+            styleSpans.remove(strikethroughSpan);
+        }
+    }
+
+    // set link ===================================================================================
+
+    /**
+     * 设置link样式
+     *
+     * @param valid 是否为link
+     */
+    public void setLink(boolean valid) {
+        if (valid) {
+            styleSpans.add(linkSpan);
+        } else {
+            styleSpans.remove(linkSpan);
+        }
+    }
+
+    /**
+     * * * * * * *  增加选中样式操作 end* * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *  * * * * * * *
+     */
+
+    // toggle bold ===================================================================================
+
+    /**
+     * 把选中的一段文字设置为粗体或者非粗体
+     */
     public void bold(boolean valid) {
         if (valid) {
             styleValid(Typeface.BOLD, getSelectionStart(), getSelectionEnd());
@@ -125,6 +228,11 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
         }
     }
 
+    // toggle italic ===================================================================================
+
+    /**
+     * 把选中的一段文字设置为斜体或者非斜体
+     */
     public void italic(boolean valid) {
         if (valid) {
             styleValid(Typeface.ITALIC, getSelectionStart(), getSelectionEnd());
@@ -267,8 +375,11 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
         getEditableText().insert(start, ss);// 设置ss要添加的位置
     }
 
-    // UnderlineSpan ===============================================================================
+    // toggle UnderlineSpan ===================================================================================
 
+    /**
+     * 把选中的一段文字设置为下划线或者非下划线
+     */
     public void underline(boolean valid) {
         if (valid) {
             underlineValid(getSelectionStart(), getSelectionEnd());
@@ -341,8 +452,11 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
         }
     }
 
-    // StrikethroughSpan ===========================================================================
+    // toggle StrikethroughSpan ===================================================================================
 
+    /**
+     * 把选中的一段文字设置为删除线或者非删除线
+     */
     public void strikethrough(boolean valid) {
         if (valid) {
             strikethroughValid(getSelectionStart(), getSelectionEnd());
@@ -416,8 +530,11 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
         }
     }
 
-    // BulletSpan ==================================================================================
+    // toggle BulletSpan ===================================================================================
 
+    /**
+     * 把选中的一段文字设置为BulletSpan或者非BulletSpan
+     */
     public void bullet(boolean valid) {
         if (valid) {
             bulletValid();
@@ -552,8 +669,11 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
         return spans.length > 0;
     }
 
-    // QuoteSpan ===================================================================================
+    // toggle QuoteSpan ===================================================================================
 
+    /**
+     * 把选中的一段文字设置为QuoteSpan或者非QuoteSpan
+     */
     public void quote(boolean valid) {
         if (valid) {
             quoteValid();
@@ -687,8 +807,12 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
         return spans.length > 0;
     }
 
-    // URLSpan =====================================================================================
+    // toggle URLSpan ===================================================================================
 
+    /**
+     * 把选中的一段文字设置为link线
+     * 通过str是否为空来表示 是把选中的文字变为link或者非link
+     */
     public void link(String link) {
         link(link, getSelectionStart(), getSelectionEnd());
     }
@@ -758,6 +882,7 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
             return;
         }
 
+        textStart = getSelectionStart();
         inputBefore = new SpannableStringBuilder(text);
     }
 
@@ -768,6 +893,35 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable text) {
+        textEnd = getSelectionEnd();
+        //execute spanlist
+        if (textStart < textEnd) {
+            //这里通过检索list里面有哪些样式，依次设置样式
+            for (ParcelableSpan styleSpan : styleSpans) {
+                ParcelableSpan newSpan = null;
+                if (styleSpan instanceof StyleSpan) {
+                    StyleSpan style = (StyleSpan) styleSpan;
+                    if (Typeface.BOLD == style.getStyle()) {
+                        //bold
+                        //注意这里，不能使用list里面的包含的样式，需要重新new出来
+                        //因为是包含多个同种样式（只是start 和 end不一样）
+                        newSpan = new StyleSpan(Typeface.BOLD);
+                    } else if (Typeface.ITALIC == style.getStyle()) {
+                        //italic
+                        newSpan = new StyleSpan(Typeface.ITALIC);
+                    }
+                } else if (styleSpan instanceof UnderlineSpan) {
+                    newSpan = new UnderlineSpan();
+                } else if (styleSpan instanceof StrikethroughSpan) {
+                    newSpan = new StrikethroughSpan();
+                } else if (styleSpan instanceof URLSpan) {
+                    String link = text.toString();
+                    newSpan = new MyURLSpan(link, linkColor, linkUnderline);
+                }
+                getEditableText().setSpan(newSpan, textStart, textEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+
         if (!historyEnable || historyWorking) {
             return;
         }

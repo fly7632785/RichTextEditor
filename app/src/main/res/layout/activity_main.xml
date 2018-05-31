@@ -5,7 +5,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.scrat.app.richtexteditor.MainActivity">
+    <HorizontalScrollView
+        android:id="@+id/set_tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="48dp"
+        android:scrollbars="none">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_bg"
+                android:contentDescription="@null"
+                android:onClick="insertBold"
+                android:scaleType="center"
+                android:src="@drawable/ic_format_bold" />
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_bg"
+                android:contentDescription="@null"
+                android:onClick="insertItalic"
+                android:scaleType="center"
+                android:src="@drawable/ic_format_italic" />
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_bg"
+                android:contentDescription="@null"
+                android:onClick="insertUnderline"
+                android:scaleType="center"
+                android:src="@drawable/ic_format_underline" />
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_bg"
+                android:contentDescription="@null"
+                android:onClick="insertStrikethrough"
+                android:scaleType="center"
+                android:src="@drawable/ic_format_strikethrough" />
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_bg"
+                android:contentDescription="@null"
+                android:onClick="insertLink"
+                android:scaleType="center"
+                android:src="@drawable/ic_insert_link" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
     <HorizontalScrollView
         android:id="@+id/tools"
         android:layout_width="match_parent"
@@ -60,6 +120,15 @@
                 android:layout_height="48dp"
                 android:background="?android:selectableItemBackground"
                 android:contentDescription="@null"
+                android:onClick="setLink"
+                android:scaleType="center"
+                android:src="@drawable/ic_insert_link" />
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?android:selectableItemBackground"
+                android:contentDescription="@null"
                 android:onClick="setBullet"
                 android:scaleType="center"
                 android:src="@drawable/ic_format_bullet" />
@@ -98,7 +167,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/tools"
+        android:layout_above="@id/set_tools"
         android:layout_alignParentTop="true"
         android:fillViewport="true">
 
