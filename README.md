@@ -2,6 +2,13 @@
 
 Android 下的富文本编辑器
 
+
+
+##此版本for自[RichTextEditor](https://github.com/huzhenjie/RichTextEditor)
+新增功能：
+> 增加加粗、斜体、下划线、删除线、link等选中样式，选中之后，打字直接表现为该样式，这些样式可叠加。
+(原来为 需要长按选中一段文字之后，点击样式图标来切换样式)
+![](https://raw.githubusercontent.com/fly7632785/RichTextEditor/master/images/preview2.png)
 ## Features
 
 * Redo
