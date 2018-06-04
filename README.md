@@ -5,10 +5,27 @@ Android 下的富文本编辑器
 
 
 ##此版本for自[RichTextEditor](https://github.com/huzhenjie/RichTextEditor)
+感谢作者开源此库，才让我们能"肆意妄为"地修改
+
 新增功能：
-> 增加加粗、斜体、下划线、删除线、link等选中样式，选中之后，打字直接表现为该样式，这些样式可叠加。
-(原来为 需要长按选中一段文字之后，点击样式图标来切换样式)
-![](https://raw.githubusercontent.com/fly7632785/RichTextEditor/master/images/preview2.png)
+> 1、增加加粗、斜体、下划线、删除线、link等选中样式，选中之后，打字直接表现为该样式，这些样式可叠加。
+(原来为 需要长按选中一段文字之后，点击样式图标来切换样式)<br>
+2、增加设置字体大小功能，支持12-24字体大小，分为7个档，对应浏览器font-size的1-7个等级大小（默认大小是3）<br>
+3、增加设置字体颜色功能<br>
+4、修改完善demo
+
+preview:
+![](https://raw.githubusercontent.com/fly7632785/RichTextEditor/master/images/preview3.png)
+
+新版gradle引入：
+```
+dependencies {
+    compile 'com.github.fly7632785:RichTextEditor:1.0.6'
+}
+```
+
+
+
 ## Features
 
 * Redo

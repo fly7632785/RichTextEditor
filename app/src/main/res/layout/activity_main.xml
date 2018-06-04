@@ -6,6 +6,115 @@
     android:layout_height="match_parent"
     tools:context="com.scrat.app.richtexteditor.MainActivity">
     <HorizontalScrollView
+        android:id="@+id/size_tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="144dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
+
+            <TextView  android:layout_width="48dp"
+                android:onClick="setSize12"
+                android:text="12"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:layout_height="48dp"/>
+            <TextView  android:layout_width="48dp"
+                android:textColor="#fff"
+                android:onClick="setSize13"
+                android:text="13"
+                android:gravity="center"
+                android:layout_height="48dp"/>
+            <TextView  android:layout_width="48dp"
+                android:onClick="setSize14"
+                android:text="14"
+                android:gravity="center"
+                android:textColor="#fff"
+                android:layout_height="48dp"/>
+            <TextView  android:layout_width="48dp"
+                android:onClick="setSize16"
+                android:text="16"
+                android:gravity="center"
+                android:textColor="#fff"
+                android:layout_height="48dp"/>
+            <TextView  android:layout_width="48dp"
+                android:onClick="setSize18"
+                android:text="18"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:layout_height="48dp"/>
+            <TextView  android:layout_width="48dp"
+                android:onClick="setSize20"
+                android:text="20"
+                android:gravity="center"
+                android:textColor="#fff"
+                android:layout_height="48dp"/>
+            <TextView  android:layout_width="48dp"
+                android:onClick="setSize24"
+                android:text="24"
+                android:textColor="#fff"
+                android:gravity="center"
+                android:layout_height="48dp"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+    <HorizontalScrollView
+        android:id="@+id/color_tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="96dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <View  android:layout_width="48dp"
+                android:background="@color/md_black_color_code"
+                android:onClick="setBlack"
+                android:layout_height="48dp"/>
+            <View  android:layout_width="48dp"
+                android:background="@color/md_red_500_color_code"
+                android:onClick="setRed"
+                android:layout_height="48dp"/>
+            <View  android:layout_width="48dp"
+                android:background="@color/md_purple_500_color_code"
+                android:onClick="setPurple"
+                android:layout_height="48dp"/>
+            <View  android:layout_width="48dp"
+                android:background="@color/md_indigo_500_color_code"
+                android:onClick="setIndigo"
+                android:layout_height="48dp"/>
+            <View  android:layout_width="48dp"
+                android:background="@color/md_light_blue_500_color_code"
+                android:onClick="setBlue"
+                android:layout_height="48dp"/>
+            <View  android:layout_width="48dp"
+                android:background="@color/md_green_500_color_code"
+                android:onClick="setGreen"
+                android:layout_height="48dp"/>
+            <View  android:layout_width="48dp"
+                android:background="@color/md_lime_500_color_code"
+                android:onClick="setLime"
+                android:layout_height="48dp"/>
+            <View  android:layout_width="48dp"
+                android:background="@color/md_orange_500_color_code"
+                android:onClick="setOrange"
+                android:layout_height="48dp"/>
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+    <HorizontalScrollView
         android:id="@+id/set_tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -167,7 +276,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/set_tools"
+        android:layout_above="@id/size_tools"
         android:layout_alignParentTop="true"
         android:fillViewport="true">
 

@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.ParcelableSpan;
@@ -14,7 +15,9 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BulletSpan;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.QuoteSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
@@ -136,6 +139,46 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
 
     private URLSpan linkSpan = new URLSpan("");
 
+    private int fontColor;
+
+    private int fontSize = 14;
+
+    private ForegroundColorSpan colorSpan = new ForegroundColorSpan(getResources().getColor(R.color.md_black_color_code));
+
+    private AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(fontSize,true);
+
+    // set AbsoluteSizeSpan ===================================================================================
+    public void setFontSize(int size) {
+        if (styleSpans.contains(sizeSpan)) {
+            styleSpans.remove(sizeSpan);
+        }
+        this.fontSize = size;
+        sizeSpan = new AbsoluteSizeSpan(fontSize,true);
+        styleSpans.add(sizeSpan);
+    }
+
+    // set ForegroundColorSpan ===================================================================================
+    public void setFontColor(@ColorInt int color) {
+        if (styleSpans.contains(colorSpan)) {
+            styleSpans.remove(colorSpan);
+        }
+        this.fontColor = color;
+        colorSpan = new ForegroundColorSpan(getResources().getColor(fontColor));
+        styleSpans.add(colorSpan);
+    }
+
+    /**
+     * 设置字体颜色样式
+     *
+     * @param valid 是否
+     */
+    public void setColor(boolean valid) {
+        if (valid) {
+            styleSpans.add(colorSpan);
+        } else {
+            styleSpans.remove(colorSpan);
+        }
+    }
     // set StyleSpan ===================================================================================
 
     /**
@@ -811,6 +854,7 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
 
     /**
      * 把选中的一段文字设置为link线
+     * link对应的url
      * 通过str是否为空来表示 是把选中的文字变为link或者非link
      */
     public void link(String link) {
@@ -917,6 +961,10 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
                 } else if (styleSpan instanceof URLSpan) {
                     String link = text.toString();
                     newSpan = new MyURLSpan(link, linkColor, linkUnderline);
+                } else if (styleSpan instanceof ForegroundColorSpan) {
+                    newSpan = new ForegroundColorSpan(getResources().getColor(fontColor));
+                } else if (styleSpan instanceof AbsoluteSizeSpan) {
+                    newSpan = new AbsoluteSizeSpan(fontSize,true);
                 }
                 getEditableText().setSpan(newSpan, textStart, textEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }

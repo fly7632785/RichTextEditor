@@ -4,8 +4,10 @@ import android.graphics.Typeface;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.BulletSpan;
 import android.text.style.CharacterStyle;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.ParagraphStyle;
 import android.text.style.QuoteSpan;
@@ -16,6 +18,7 @@ import android.text.style.UnderlineSpan;
 
 public class HtmlParser {
     public static Spanned fromHtml(String source, Html.ImageGetter imageGetter) {
+
         return Html.fromHtml(source, imageGetter, new MyTagHandler());
     }
 
@@ -166,6 +169,16 @@ public class HtmlParser {
                     out.append(((URLSpan) span).getURL());
                     out.append("\">");
                 }
+                if (span instanceof ForegroundColorSpan) {
+                    //sub 2 exclude ff
+                    out.append("<font color=\"#" + Integer.toHexString(((ForegroundColorSpan) span).getForegroundColor()).substring(2) + "\">");
+                }
+                if (span instanceof AbsoluteSizeSpan) {
+                    //从 1 到 7 的数字。浏览器默认值是 3。
+                    out.append("<font size=\"" + getSize(((AbsoluteSizeSpan) span).getSize()) + "\">");
+                    //自定义的字体大小tag 因为默认的HTML解析不支持font size，所以这里自定义一个
+                    out.append("<size value=\"" + getSize(((AbsoluteSizeSpan) span).getSize()) + "\">");
+                }
 
                 if (span instanceof ImageSpan) {
                     out.append("<img width=\"100%\" src=\"");
@@ -179,6 +192,14 @@ public class HtmlParser {
 
             withinStyle(out, text, i, next);
             for (int j = spans.length - 1; j >= 0; j--) {
+                if (spans[j] instanceof AbsoluteSizeSpan) {
+                    out.append("</size>");
+                    out.append("</font>");
+                }
+
+                if (spans[j] instanceof ForegroundColorSpan) {
+                    out.append("</font>");
+                }
                 if (spans[j] instanceof URLSpan) {
                     out.append("</a>");
                 }
@@ -208,6 +229,29 @@ public class HtmlParser {
         for (int i = 0; i < nl; i++) {
             out.append("<br>");
         }
+    }
+
+    /**
+     * 从 1 到 7 的数字。浏览器默认值是 3。
+     */
+    private static int getSize(int s) {
+        int size = 3;
+        if (s <= 12) {
+            size = 1;
+        } else if (s <= 14) {
+            size = 2;
+        } else if (s <= 16) {
+            size = 3;
+        } else if (s <= 18) {
+            size = 4;
+        } else if (s <= 20) {
+            size = 5;
+        } else if (s <= 22) {
+            size = 6;
+        } else {
+            size = 7;
+        }
+        return size;
     }
 
     private static void withinStyle(StringBuilder out, CharSequence text, int start, int end) {
