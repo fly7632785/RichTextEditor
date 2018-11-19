@@ -7,12 +7,12 @@ import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.widget.TextView;
 
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
-import com.scrat.app.richtext.glide.GlideRequest;
-import com.scrat.app.richtext.glide.GlideRequests;
 import com.scrat.app.richtext.util.Util;
 
 import java.util.HashSet;
@@ -25,8 +25,8 @@ public class GlideImageGeter implements Html.ImageGetter {
     private HashSet<Target> targets;
     private HashSet<GifDrawable> gifDrawables;
     private final TextView textView;
-    private GlideRequest<GifDrawable> gifLoadRequest;
-    private GlideRequest<Bitmap> bitmapLoadRequest;
+    private RequestBuilder<GifDrawable> gifLoadRequest;
+    private RequestBuilder<Bitmap> bitmapLoadRequest;
 
     public void recycle() {
         targets.clear();
@@ -37,7 +37,7 @@ public class GlideImageGeter implements Html.ImageGetter {
         gifDrawables.clear();
     }
 
-    public GlideImageGeter(TextView textView, GlideRequests glideRequests) {
+    public GlideImageGeter(TextView textView, RequestManager glideRequests) {
         this.textView = textView;
         targets = new HashSet<>();
         gifDrawables = new HashSet<>();

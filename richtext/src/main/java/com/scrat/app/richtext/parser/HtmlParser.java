@@ -2,9 +2,11 @@ package com.scrat.app.richtext.parser;
 
 import android.graphics.Typeface;
 import android.text.Html;
+import android.text.Layout;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
+import android.text.style.AlignmentSpan;
 import android.text.style.BulletSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
@@ -45,6 +47,8 @@ public class HtmlParser {
                     withinBulletThenQuote(out, text, i, next++);
                 } else if (styles[0] instanceof QuoteSpan && styles[1] instanceof BulletSpan) {
                     withinQuoteThenBullet(out, text, i, next++);
+                } else if (styles[0] instanceof AlignmentSpan || styles[1] instanceof AlignmentSpan) {
+                    withAlign(out, text, i, next);
                 } else {
                     withinContent(out, text, i, next);
                 }
@@ -53,11 +57,51 @@ public class HtmlParser {
                     withinBullet(out, text, i, next++);
                 } else if (styles[0] instanceof QuoteSpan) {
                     withinQuote(out, text, i, next++);
+                } else if (styles[0] instanceof AlignmentSpan) {
+                    withAlign(out, text, i, next);
                 } else {
                     withinContent(out, text, i, next);
                 }
+            } else if (styles.length == 3) { // quote bullet align
+                if (styles[0] instanceof AlignmentSpan || styles[1] instanceof AlignmentSpan || styles[2] instanceof AlignmentSpan) {
+                    withAlign(out, text, i, next);
+                }
             } else {
                 withinContent(out, text, i, next);
+            }
+        }
+    }
+
+    private static void withAlign(StringBuilder out, Spanned text, int start, int end) {
+        int next;
+
+        for (int i = start; i < end; i = next) {
+            next = text.nextSpanTransition(i, end, AlignmentSpan.class);
+
+            AlignmentSpan[] alignmentSpans = text.getSpans(i, next, AlignmentSpan.class);
+            for (AlignmentSpan alignmentSpan : alignmentSpans) {
+
+                String elements = "";
+                if (alignmentSpan.getAlignment() == Layout.Alignment.ALIGN_CENTER) {
+                    elements = "\"center\" " + elements;
+                } else if (alignmentSpan.getAlignment() == Layout.Alignment.ALIGN_OPPOSITE) {
+                    elements = "\"right\" " + elements;
+                } else {
+                    elements = "\"left\" " + elements;
+                }
+
+                out.append("<align value=" + elements)
+                        .append(">")
+                        .append("<div ")
+                        .append("align=" + elements)
+                        .append(">");
+
+            }
+
+            withinContent(out, text, i, next);
+            for (AlignmentSpan alignmentSpan : alignmentSpans) {
+                out.append("</div>");
+                out.append("</align>");
             }
         }
     }
@@ -158,6 +202,7 @@ public class HtmlParser {
                 if (span instanceof UnderlineSpan) {
                     out.append("<u>");
                 }
+
 
                 // Use standard strikethrough tag <del> rather than <s> or <strike>
                 if (span instanceof StrikethroughSpan) {
@@ -290,6 +335,8 @@ public class HtmlParser {
     }
 
     private static String tidy(String html) {
-        return html.replaceAll("</ul>(<br>)?", "</ul>").replaceAll("</blockquote>(<br>)?", "</blockquote>");
+        return html.replaceAll("</ul>(<br>)?", "</ul>")
+                .replaceAll("</blockquote>(<br>)?", "</blockquote>")
+                .replaceAll("</align>(<br>)?", "</align>");
     }
 }

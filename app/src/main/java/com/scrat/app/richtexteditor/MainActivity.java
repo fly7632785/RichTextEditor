@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                             "<img src=\"http://biuugames.huya.com/5-160222145918.jpg\"><br><br>"
             );
         } else {
+            Log.e("xxxx", html);
             richEditText.fromHtml(html);
         }
     }
@@ -98,6 +100,31 @@ public class MainActivity extends AppCompatActivity {
         final Uri uri = data.getData();
         final int width = richEditText.getMeasuredWidth() - richEditText.getPaddingLeft() - richEditText.getPaddingRight();
         richEditText.image(uri, width);
+    }
+
+
+    public void setAlignStart(View v) {
+        richEditText.setAlignment(Layout.Alignment.ALIGN_NORMAL);
+    }
+
+    public void setAlignCenter(View v) {
+        richEditText.setAlignment(Layout.Alignment.ALIGN_CENTER);
+    }
+
+    public void setAlignEnd(View v) {
+        richEditText.setAlignment(Layout.Alignment.ALIGN_OPPOSITE);
+    }
+
+    public void insertStart(View v) {
+        richEditText.align(!richEditText.contains(RichEditText.FORMAT_ALIGN), Layout.Alignment.ALIGN_NORMAL);
+    }
+
+    public void insertCenter(View v) {
+        richEditText.align(!richEditText.contains(RichEditText.FORMAT_ALIGN), Layout.Alignment.ALIGN_CENTER);
+    }
+
+    public void insertEnd(View v) {
+        richEditText.align(!richEditText.contains(RichEditText.FORMAT_ALIGN), Layout.Alignment.ALIGN_OPPOSITE);
     }
 
 

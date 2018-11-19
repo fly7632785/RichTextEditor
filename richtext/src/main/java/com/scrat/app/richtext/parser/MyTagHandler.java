@@ -2,9 +2,11 @@ package com.scrat.app.richtext.parser;
 
 import android.text.Editable;
 import android.text.Html;
+import android.text.Layout;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
+import android.text.style.AlignmentSpan;
 import android.text.style.BulletSpan;
 import android.text.style.StrikethroughSpan;
 
@@ -20,6 +22,7 @@ public class MyTagHandler implements Html.TagHandler {
     private static final String STRIKETHROUGH_STRIKE = "strike";
     private static final String STRIKETHROUGH_DEL = "del";
     private static final String FONT = "size";//自定义的tag标签 <size value="1"><size/> 来定义字体大小
+    private static final String ALIGN = "align";//自定义的tag标签 <align value="left"><align/> 来定义位置
 
     private static class Li {
     }
@@ -51,6 +54,8 @@ public class MyTagHandler implements Html.TagHandler {
                 start(output, new Strike());
             } else if (tag.equalsIgnoreCase(FONT)) {
                 handlerStartSIZE(output, xmlReader);
+            } else if (tag.equalsIgnoreCase(ALIGN)) {
+                handlerStartAlign(output, xmlReader);
             }
         } else {
             if (tag.equalsIgnoreCase(BULLET_LI)) {
@@ -62,6 +67,8 @@ public class MyTagHandler implements Html.TagHandler {
                 end(output, Strike.class, new StrikethroughSpan());
             } else if (tag.equalsIgnoreCase(FONT)) {
                 handlerEndSIZE(output);
+            } else if (tag.equalsIgnoreCase(ALIGN)) {
+                handlerEndAlign(output);
             }
         }
     }
@@ -133,6 +140,43 @@ public class MyTagHandler implements Html.TagHandler {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void handlerStartAlign(Editable output, XMLReader xmlReader) {
+        if (startIndex == null) {
+            startIndex = new Stack<>();
+        }
+        startIndex.push(output.length());
+
+        if (propertyValue == null) {
+            propertyValue = new Stack<>();
+        }
+
+        propertyValue.push(getProperty(xmlReader, "value"));
+    }
+
+    private void handlerEndAlign(Editable output) {
+
+        if (!isEmpty(propertyValue)) {
+            try {
+                String align = propertyValue.pop();
+                output.setSpan(new AlignmentSpan.Standard(getAlign(align)), startIndex.pop(), output.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Layout.Alignment getAlign(String align) {
+        switch (align) {
+            case "left":
+                return Layout.Alignment.ALIGN_NORMAL;
+            case "center":
+                return Layout.Alignment.ALIGN_CENTER;
+            case "right":
+                return Layout.Alignment.ALIGN_OPPOSITE;
+        }
+        return Layout.Alignment.ALIGN_NORMAL;
     }
 
 

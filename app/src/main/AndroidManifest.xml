@@ -8,6 +8,7 @@
 
     <application
         android:supportsRtl="true"
+        android:name=".MyApplication"
         android:theme="@style/AppTheme">
         <activity
             android:name="com.scrat.app.richtexteditor.MainActivity"

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.ParcelableSpan;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -16,6 +17,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
+import android.text.style.AlignmentSpan;
 import android.text.style.BulletSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.QuoteSpan;
@@ -26,10 +28,11 @@ import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.view.inputmethod.InputMethodManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.scrat.app.richtext.glide.GlideApp;
-import com.scrat.app.richtext.glide.GlideRequests;
 import com.scrat.app.richtext.img.GlideImageGeter;
 import com.scrat.app.richtext.parser.HtmlParser;
 import com.scrat.app.richtext.parser.MarkdownParser;
@@ -51,6 +54,7 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
     public static final int FORMAT_BULLET = 0x05;
     public static final int FORMAT_QUOTE = 0x06;
     public static final int FORMAT_LINK = 0x07;
+    public static final int FORMAT_ALIGN = 0x08;
 
     private int bulletColor = 0;
     private int bulletRadius = 0;
@@ -68,7 +72,7 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
     private int historyCursor = 0;
 
     private SpannableStringBuilder inputBefore;
-    private GlideRequests glideRequests;
+    private RequestManager glideRequests;
     private Editable inputLast;
 
     private List<ParcelableSpan> styleSpans = new ArrayList<>();
@@ -91,7 +95,7 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
     }
 
     private void init(Context context, AttributeSet attrs) {
-        glideRequests = GlideApp.with(context);
+        glideRequests = Glide.with(context);
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RichEditText);
         bulletColor = array.getColor(R.styleable.RichEditText_bulletColor, 0);
         bulletRadius = array.getDimensionPixelSize(R.styleable.RichEditText_bulletRadius, 0);
@@ -143,9 +147,164 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
 
     private int fontSize = 14;
 
+    private Layout.Alignment alignMent = Layout.Alignment.ALIGN_NORMAL;
+
     private ForegroundColorSpan colorSpan = new ForegroundColorSpan(getResources().getColor(R.color.md_black_color_code));
 
-    private AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(fontSize,true);
+    private AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(fontSize, true);
+
+    private AlignmentSpan.Standard alignmentSpan = new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL);
+
+
+    // toggle QuoteSpan ===================================================================================
+
+    /**
+     * 把选中的一段文字设置为QuoteSpan或者非QuoteSpan
+     */
+    public void align(boolean valid, Layout.Alignment alignMent) {
+        this.alignMent = alignMent;
+        if (valid) {
+            alignValid();
+        } else {
+            alignInvalid();
+        }
+    }
+
+    protected void alignValid() {
+        String[] lines = TextUtils.split(getEditableText().toString(), "\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            if (containAlign(i)) {
+                continue;
+            }
+
+            int lineStart = 0;
+            for (int j = 0; j < i; j++) {
+                lineStart = lineStart + lines[j].length() + 1; // \n
+            }
+
+            int lineEnd = lineStart + lines[i].length();
+            if (lineStart >= lineEnd) {
+                continue;
+            }
+
+            int quoteStart = 0;
+            int quoteEnd = 0;
+            if (lineStart <= getSelectionStart() && getSelectionEnd() <= lineEnd) {
+                quoteStart = lineStart;
+                quoteEnd = lineEnd;
+            } else if (getSelectionStart() <= lineStart && lineEnd <= getSelectionEnd()) {
+                quoteStart = lineStart;
+                quoteEnd = lineEnd;
+            }
+
+            if (quoteStart < quoteEnd) {
+                AlignmentSpan span = new AlignmentSpan.Standard(alignMent);
+                getEditableText().setSpan(
+                        span, quoteStart, quoteEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+    }
+
+    protected void alignInvalid() {
+        String[] lines = TextUtils.split(getEditableText().toString(), "\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            if (!containAlign(i)) {
+                continue;
+            }
+
+            int lineStart = 0;
+            for (int j = 0; j < i; j++) {
+                lineStart = lineStart + lines[j].length() + 1;
+            }
+
+            int lineEnd = lineStart + lines[i].length();
+            if (lineStart >= lineEnd) {
+                continue;
+            }
+
+            int quoteStart = 0;
+            int quoteEnd = 0;
+            if (lineStart <= getSelectionStart() && getSelectionEnd() <= lineEnd) {
+                quoteStart = lineStart;
+                quoteEnd = lineEnd;
+            } else if (getSelectionStart() <= lineStart && lineEnd <= getSelectionEnd()) {
+                quoteStart = lineStart;
+                quoteEnd = lineEnd;
+            }
+
+            if (quoteStart < quoteEnd) {
+                AlignmentSpan[] spans = getEditableText()
+                        .getSpans(quoteStart, quoteEnd, AlignmentSpan.class);
+                for (AlignmentSpan span : spans) {
+                    getEditableText().removeSpan(span);
+                }
+            }
+        }
+    }
+
+    protected boolean containAlign() {
+        String[] lines = TextUtils.split(getEditableText().toString(), "\n");
+        List<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < lines.length; i++) {
+            int lineStart = 0;
+            for (int j = 0; j < i; j++) {
+                lineStart = lineStart + lines[j].length() + 1;
+            }
+
+            int lineEnd = lineStart + lines[i].length();
+            if (lineStart >= lineEnd) {
+                continue;
+            }
+
+            if (lineStart <= getSelectionStart() && getSelectionEnd() <= lineEnd) {
+                list.add(i);
+            } else if (getSelectionStart() <= lineStart && lineEnd <= getSelectionEnd()) {
+                list.add(i);
+            }
+        }
+
+        for (Integer i : list) {
+            if (!containAlign(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected boolean containAlign(int index) {
+        String[] lines = TextUtils.split(getEditableText().toString(), "\n");
+        if (index < 0 || index >= lines.length) {
+            return false;
+        }
+
+        int start = 0;
+        for (int i = 0; i < index; i++) {
+            start = start + lines[i].length() + 1;
+        }
+
+        int end = start + lines[index].length();
+        if (start >= end) {
+            return false;
+        }
+
+        AlignmentSpan[] spans = getEditableText().getSpans(start, end, AlignmentSpan.class);
+        return spans.length > 0;
+    }
+
+
+    // set AlignmentSpan ===================================================================================
+    public void setAlignment(Layout.Alignment alignMent) {
+        if (styleSpans.contains(alignmentSpan)) {
+            styleSpans.remove(alignmentSpan);
+        }
+        this.alignMent = alignMent;
+        alignmentSpan = new AlignmentSpan.Standard(alignMent);
+        styleSpans.add(alignmentSpan);
+    }
 
     // set AbsoluteSizeSpan ===================================================================================
     public void setFontSize(int size) {
@@ -153,7 +312,7 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
             styleSpans.remove(sizeSpan);
         }
         this.fontSize = size;
-        sizeSpan = new AbsoluteSizeSpan(fontSize,true);
+        sizeSpan = new AbsoluteSizeSpan(fontSize, true);
         styleSpans.add(sizeSpan);
     }
 
@@ -392,9 +551,9 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
     public void image(final Uri uri, final int maxWidth) {
         glideRequests.asBitmap()
                 .load(uri)
-                .centerCrop()
-                .error(R.drawable.ic_pic_fill)
-                .placeholder(R.drawable.ic_pic_fill)
+                .apply(RequestOptions.centerCropTransform())
+                .apply(RequestOptions.errorOf(R.drawable.ic_pic_fill))
+                .apply(RequestOptions.placeholderOf(R.drawable.ic_pic_fill))
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(
@@ -964,7 +1123,9 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
                 } else if (styleSpan instanceof ForegroundColorSpan) {
                     newSpan = new ForegroundColorSpan(getResources().getColor(fontColor));
                 } else if (styleSpan instanceof AbsoluteSizeSpan) {
-                    newSpan = new AbsoluteSizeSpan(fontSize,true);
+                    newSpan = new AbsoluteSizeSpan(fontSize, true);
+                } else if (styleSpan instanceof AlignmentSpan) {
+                    newSpan = new AlignmentSpan.Standard(alignMent);
                 }
                 getEditableText().setSpan(newSpan, textStart, textEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
@@ -1066,6 +1227,8 @@ public class RichEditText extends AppCompatEditText implements TextWatcher {
                 return containQuote();
             case FORMAT_LINK:
                 return containLink(getSelectionStart(), getSelectionEnd());
+            case FORMAT_ALIGN:
+                return containAlign();
             default:
                 return false;
         }

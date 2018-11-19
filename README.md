@@ -4,7 +4,7 @@ Android 下的富文本编辑器
 
 
 
-##此版本for自[RichTextEditor](https://github.com/huzhenjie/RichTextEditor)
+## 此版本for自[RichTextEditor](https://github.com/huzhenjie/RichTextEditor)
 感谢作者开源此库，才让我们能"肆意妄为"地修改
 
 新增功能：
@@ -13,6 +13,7 @@ Android 下的富文本编辑器
 2、增加设置字体大小功能，支持12-24字体大小，分为7个档，对应浏览器font-size的1-7个等级大小（默认大小是3）<br>
 3、增加设置字体颜色功能<br>
 4、修改完善demo
+5、修改glide，取消library中使用AppGlideModule（防止主工程中使用冲突）
 
 preview:
 ![](https://raw.githubusercontent.com/fly7632785/RichTextEditor/master/images/preview3.png)
@@ -20,7 +21,7 @@ preview:
 新版gradle引入：
 ```
 dependencies {
-    compile 'com.github.fly7632785:RichTextEditor:1.0.6'
+    compile 'com.github.fly7632785:RichTextEditor:1.0.7'
 }
 ```
 
